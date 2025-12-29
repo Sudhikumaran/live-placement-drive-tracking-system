@@ -36,8 +36,57 @@ const userSchema = new mongoose.Schema({
         max: 10,
         required: false
     },
+    phone: {
+        type: String,
+        trim: true
+    },
+    address: {
+        type: String,
+        trim: true
+    },
+    skills: [{
+        type: String,
+        trim: true
+    }],
+    linkedIn: {
+        type: String,
+        trim: true
+    },
+    github: {
+        type: String,
+        trim: true
+    },
+    portfolio: {
+        type: String,
+        trim: true
+    },
+    profilePhoto: {
+        type: String
+    },
     resumeUrl: {
         type: String
+    },
+    emailPreferences: {
+        shortlistUpdates: {
+            type: Boolean,
+            default: true
+        },
+        driveAnnouncements: {
+            type: Boolean,
+            default: true
+        },
+        applicationConfirmations: {
+            type: Boolean,
+            default: true
+        }
+    },
+    isEmailVerified: {
+        type: Boolean,
+        default: false
+    },
+    pushSubscription: {
+        type: Object,
+        default: null
     },
     refreshToken: {
         type: String,

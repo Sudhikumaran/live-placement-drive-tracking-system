@@ -5,8 +5,42 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Light Theme Variables */
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-gradient-from: #f1f5f9;
+    --bg-gradient-via: #e0e7ff;
+    --bg-gradient-to: #dbeafe;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --border-color: #e5e7eb;
+    --card-bg: #ffffff;
+    --card-border: #f3f4f6;
+    --input-bg: #ffffff;
+    --input-border: #d1d5db;
+  }
+
+  .dark {
+    /* Dark Theme Variables */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-gradient-from: #1e293b;
+    --bg-gradient-via: #312e81;
+    --bg-gradient-to: #1e3a8a;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --border-color: #334155;
+    --card-bg: #1e293b;
+    --card-border: #334155;
+    --input-bg: #334155;
+    --input-border: #475569;
+  }
+
   body {
-    @apply bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-50 text-gray-900 font-sans;
+    @apply bg-gradient-to-br text-gray-900 dark:text-gray-100 font-sans transition-colors duration-300;
+    background: linear-gradient(to bottom right, var(--bg-gradient-from), var(--bg-gradient-via), var(--bg-gradient-to));
+    color: var(--text-primary);
     min-height: 100vh;
   }
 }
@@ -15,11 +49,15 @@
 
   /* Card Styles */
   .card {
-    @apply bg-white rounded-xl shadow-lg border border-gray-100 p-6 transition-all duration-300 hover:shadow-xl;
+    background-color: var(--card-bg);
+    @apply rounded-xl shadow-lg border p-6 transition-all duration-300 hover:shadow-xl;
+    border-color: var(--card-border);
   }
 
   .card-gradient {
-    @apply bg-gradient-to-br from-white to-indigo-50 rounded-xl shadow-lg border border-indigo-100 p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02];
+    @apply bg-gradient-to-br rounded-xl shadow-lg border p-6 transition-all duration-300 hover:shadow-xl hover:scale-[1.02];
+    background: linear-gradient(to bottom right, var(--card-bg), var(--bg-gradient-via));
+    border-color: var(--card-border);
   }
 
   /* Button Styles */
@@ -28,7 +66,8 @@
   }
 
   .btn-secondary {
-    @apply bg-white text-indigo-600 border-2 border-indigo-600 px-6 py-3 rounded-lg font-semibold hover:bg-indigo-50 transition-all duration-300 transform hover:scale-105;
+    background-color: var(--card-bg);
+    @apply text-indigo-600 dark:text-indigo-400 border-2 border-indigo-600 dark:border-indigo-400 px-6 py-3 rounded-lg font-semibold hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition-all duration-300 transform hover:scale-105;
   }
 
   .btn-danger {
@@ -37,7 +76,10 @@
 
   /* Input Styles */
   .input-field {
-    @apply w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all duration-200 outline-none;
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-primary);
+    @apply w-full px-4 py-3 rounded-lg border focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-900 transition-all duration-200 outline-none;
   }
 
   /* Badge Styles */
@@ -46,23 +88,23 @@
   }
 
   .badge-success {
-    @apply bg-green-100 text-green-800;
+    @apply bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300;
   }
 
   .badge-warning {
-    @apply bg-yellow-100 text-yellow-800;
+    @apply bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300;
   }
 
   .badge-danger {
-    @apply bg-red-100 text-red-800;
+    @apply bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300;
   }
 
   .badge-info {
-    @apply bg-blue-100 text-blue-800;
+    @apply bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300;
   }
 
   .badge-primary {
-    @apply bg-indigo-100 text-indigo-800;
+    @apply bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300;
   }
 
   /* Animation Classes */
@@ -120,13 +162,13 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100;
+  @apply bg-gray-100 dark:bg-gray-800;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-indigo-400 rounded-full;
+  @apply bg-indigo-400 dark:bg-indigo-600 rounded-full;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-indigo-600;
+  @apply bg-indigo-600 dark:bg-indigo-500;
 }

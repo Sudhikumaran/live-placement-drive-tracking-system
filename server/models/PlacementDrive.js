@@ -45,6 +45,25 @@ const placementDriveSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    companyWebsite: {
+        type: String,
+        trim: true
+    },
+    jobType: {
+        type: String,
+        enum: ['Full-Time', 'Internship', 'Internship + PPO'],
+        default: 'Full-Time'
+    },
+    bondDetails: {
+        hasBond: {
+            type: Boolean,
+            default: false
+        },
+        duration: String
+    },
+    stipend: {
+        type: String
+    },
     deadline: {
         type: Date,
         required: true

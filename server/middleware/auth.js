@@ -59,3 +59,6 @@ export const authorize = (...roles) => {
 // Specific role checks
 export const requireAdmin = authorize('admin');
 export const requireStudent = authorize('student');
+
+// Alias for backward compatibility
+export const protect = authenticate;

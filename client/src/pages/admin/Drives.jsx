@@ -19,7 +19,7 @@ const AdminDrives = () => {
         status: 'upcoming',
         minCgpa: '',
         departments: [],
-        rounds: [{ name: 'Round 1', description: '' }],
+        rounds: [{ name: 'Round 1', description: '', date: '' }],
     });
 
     const departmentOptions = ['Computer Science', 'Information Technology', 'Electronics', 'Mechanical', 'Civil', 'Electrical'];
@@ -53,8 +53,69 @@ const AdminDrives = () => {
         }));
     };
 
+    // Round management functions
+    const addRound = () => {
+        setFormData(prev => ({
+            ...prev,
+            rounds: [...prev.rounds, { name: `Round ${prev.rounds.length + 1}`, description: '', date: '' }]
+        }));
+    };
+
+    const removeRound = (index) => {
+        if (formData.rounds.length === 1) {
+            toast.error('At least one round is required');
+            return;
+        }
+        setFormData(prev => ({
+            ...prev,
+            rounds: prev.rounds.filter((_, i) => i !== index)
+        }));
+    };
+
+    const updateRound = (index, field, value) => {
+        setFormData(prev => ({
+            ...prev,
+            rounds: prev.rounds.map((round, i) =>
+                i === index ? { ...round, [field]: value } : round
+            )
+        }));
+    };
+
+    const validateForm = () => {
+        if (!formData.companyName.trim()) {
+            toast.error('Company name is required');
+            return false;
+        }
+        if (!formData.role.trim()) {
+            toast.error('Role is required');
+            return false;
+        }
+        if (formData.departments.length === 0) {
+            toast.error('Select at least one department');
+            return false;
+        }
+        if (parseFloat(formData.minCgpa) < 0 || parseFloat(formData.minCgpa) > 10) {
+            toast.error('CGPA must be between 0 and 10');
+            return false;
+        }
+        if (new Date(formData.deadline) < new Date()) {
+            toast.error('Deadline must be in the future');
+            return false;
+        }
+        // Validate rounds
+        for (let i = 0; i < formData.rounds.length; i++) {
+            if (!formData.rounds[i].name.trim()) {
+                toast.error(`Round ${i + 1} name is required`);
+                return false;
+            }
+        }
+        return true;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validateForm()) return;
 
         try {
             const payload = {
@@ -95,7 +156,11 @@ const AdminDrives = () => {
             status: drive.status,
             minCgpa: drive.eligibility.minCgpa,
             departments: drive.eligibility.departments,
-            rounds: drive.rounds.length > 0 ? drive.rounds : [{ name: 'Round 1', description: '' }],
+            rounds: drive.rounds.length > 0 ? drive.rounds.map(r => ({
+                name: r.name,
+                description: r.description || '',
+                date: r.date ? r.date.split('T')[0] : ''
+            })) : [{ name: 'Round 1', description: '', date: '' }],
         });
         setShowModal(true);
     };
@@ -123,7 +188,7 @@ const AdminDrives = () => {
             status: 'upcoming',
             minCgpa: '',
             departments: [],
-            rounds: [{ name: 'Round 1', description: '' }],
+            rounds: [{ name: 'Round 1', description: '', date: '' }],
         });
     };
 
@@ -157,9 +222,10 @@ const AdminDrives = () => {
                         {drives.map((drive) => (
                             <div key={drive._id} className="card-gradient">
                                 <div className="flex items-start justify-between mb-4">
-                                    <div>
+                                    <div className="flex-1">
                                         <h3 className="text-2xl font-bold text-gray-900 mb-1">{drive.companyName}</h3>
                                         <p className="text-lg text-gray-700">{drive.role}</p>
+                                        <p className="text-sm text-gray-600 mt-2">{drive.description}</p>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <span className={`badge ${drive.status === 'upcoming' ? 'badge-info' :
@@ -182,7 +248,7 @@ const AdminDrives = () => {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                                     <div>
                                         <p className="text-sm text-gray-500">CTC</p>
                                         <p className="font-semibold text-gray-900">{drive.ctc}</p>
@@ -202,110 +268,230 @@ const AdminDrives = () => {
                                         </p>
                                     </div>
                                 </div>
+
+                                {/* Display Rounds */}
+                                {drive.rounds && drive.rounds.length > 0 && (
+                                    <div className="mt-4 pt-4 border-t border-gray-200">
+                                        <p className="text-sm font-semibold text-gray-700 mb-2">Rounds ({drive.rounds.length}):</p>
+                                        <div className="flex flex-wrap gap-2">
+                                            {drive.rounds.map((round, idx) => (
+                                                <div key={idx} className="badge bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                    {round.name}
+                                                    {round.date && ` - ${new Date(round.date).toLocaleDateString()}`}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
 
-                    {/* Modal */}
+                    {/* Enhanced Modal */}
                     {showModal && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-                            <div className="bg-white rounded-xl p-6 max-w-2xl w-full my-8">
+                            <div className="bg-white rounded-xl p-6 max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto">
                                 <h2 className="text-2xl font-bold mb-6">
                                     {editingDrive ? 'Edit Drive' : 'Create New Drive'}
                                 </h2>
 
-                                <form onSubmit={handleSubmit} className="space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-semibold mb-2">Company Name</label>
-                                            <input
-                                                type="text"
-                                                name="companyName"
-                                                value={formData.companyName}
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    {/* Company Details Section */}
+                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                        <h3 className="text-lg font-semibold mb-4 text-gray-900">Company Details</h3>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-semibold mb-2">Company Name *</label>
+                                                <input
+                                                    type="text"
+                                                    name="companyName"
+                                                    value={formData.companyName}
+                                                    onChange={handleInputChange}
+                                                    className="input-field"
+                                                    placeholder="e.g., Google, Microsoft"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold mb-2">Role/Position *</label>
+                                                <input
+                                                    type="text"
+                                                    name="role"
+                                                    value={formData.role}
+                                                    onChange={handleInputChange}
+                                                    className="input-field"
+                                                    placeholder="e.g., Software Engineer"
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-4">
+                                            <label className="block text-sm font-semibold mb-2">Job Description *</label>
+                                            <textarea
+                                                name="description"
+                                                value={formData.description}
                                                 onChange={handleInputChange}
                                                 className="input-field"
+                                                rows="3"
+                                                placeholder="Brief description of the role and responsibilities..."
                                                 required
                                             />
                                         </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold mb-2">Role</label>
-                                            <input
-                                                type="text"
-                                                name="role"
-                                                value={formData.role}
-                                                onChange={handleInputChange}
-                                                className="input-field"
-                                                required
-                                            />
+
+                                        <div className="grid grid-cols-2 gap-4 mt-4">
+                                            <div>
+                                                <label className="block text-sm font-semibold mb-2">CTC Package *</label>
+                                                <input
+                                                    type="text"
+                                                    name="ctc"
+                                                    value={formData.ctc}
+                                                    onChange={handleInputChange}
+                                                    className="input-field"
+                                                    placeholder="e.g., 10-12 LPA or 15 LPA"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold mb-2">Location *</label>
+                                                <input
+                                                    type="text"
+                                                    name="location"
+                                                    value={formData.location}
+                                                    onChange={handleInputChange}
+                                                    className="input-field"
+                                                    placeholder="e.g., Bangalore, Remote"
+                                                    required
+                                                />
+                                            </div>
                                         </div>
                                     </div>
 
+                                    {/* Eligibility Criteria Section */}
+                                    <div className="bg-blue-50 p-4 rounded-lg">
+                                        <h3 className="text-lg font-semibold mb-4 text-gray-900">Eligibility Criteria</h3>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-semibold mb-2">Minimum CGPA *</label>
+                                                <input
+                                                    type="number"
+                                                    step="0.01"
+                                                    min="0"
+                                                    max="10"
+                                                    name="minCgpa"
+                                                    value={formData.minCgpa}
+                                                    onChange={handleInputChange}
+                                                    className="input-field"
+                                                    placeholder="e.g., 7.5"
+                                                    required
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-semibold mb-2">Application Deadline *</label>
+                                                <input
+                                                    type="date"
+                                                    name="deadline"
+                                                    value={formData.deadline}
+                                                    onChange={handleInputChange}
+                                                    className="input-field"
+                                                    min={new Date().toISOString().split('T')[0]}
+                                                    required
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-4">
+                                            <label className="block text-sm font-semibold mb-2">Eligible Departments *</label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {departmentOptions.map(dept => (
+                                                    <button
+                                                        key={dept}
+                                                        type="button"
+                                                        onClick={() => handleDepartmentToggle(dept)}
+                                                        className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${formData.departments.includes(dept)
+                                                                ? 'bg-indigo-600 text-white'
+                                                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                                            }`}
+                                                    >
+                                                        {dept}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                            {formData.departments.length === 0 && (
+                                                <p className="text-xs text-red-600 mt-1">Please select at least one department</p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Rounds Section */}
+                                    <div className="bg-green-50 p-4 rounded-lg">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <h3 className="text-lg font-semibold text-gray-900">Selection Rounds</h3>
+                                            <button
+                                                type="button"
+                                                onClick={addRound}
+                                                className="px-3 py-1 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700"
+                                            >
+                                                + Add Round
+                                            </button>
+                                        </div>
+
+                                        <div className="space-y-3">
+                                            {formData.rounds.map((round, index) => (
+                                                <div key={index} className="bg-white p-4 rounded-lg border border-green-200">
+                                                    <div className="flex items-start justify-between mb-3">
+                                                        <h4 className="font-semibold text-gray-700">Round {index + 1}</h4>
+                                                        {formData.rounds.length > 1 && (
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeRound(index)}
+                                                                className="text-red-600 hover:text-red-700 text-sm"
+                                                            >
+                                                                ✕ Remove
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                    <div className="grid grid-cols-3 gap-3">
+                                                        <div>
+                                                            <label className="block text-xs font-semibold mb-1">Round Name *</label>
+                                                            <input
+                                                                type="text"
+                                                                value={round.name}
+                                                                onChange={(e) => updateRound(index, 'name', e.target.value)}
+                                                                className="input-field text-sm"
+                                                                placeholder="e.g., Technical Round"
+                                                                required
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-xs font-semibold mb-1">Description</label>
+                                                            <input
+                                                                type="text"
+                                                                value={round.description}
+                                                                onChange={(e) => updateRound(index, 'description', e.target.value)}
+                                                                className="input-field text-sm"
+                                                                placeholder="Optional round details"
+                                                            />
+                                                        </div>
+                                                        <div>
+                                                            <label className="block text-xs font-semibold mb-1">Scheduled Date</label>
+                                                            <input
+                                                                type="date"
+                                                                value={round.date}
+                                                                onChange={(e) => updateRound(index, 'date', e.target.value)}
+                                                                className="input-field text-sm"
+                                                                min={new Date().toISOString().split('T')[0]}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Drive Status */}
                                     <div>
-                                        <label className="block text-sm font-semibold mb-2">Description</label>
-                                        <textarea
-                                            name="description"
-                                            value={formData.description}
-                                            onChange={handleInputChange}
-                                            className="input-field"
-                                            rows="3"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-semibold mb-2">CTC</label>
-                                            <input
-                                                type="text"
-                                                name="ctc"
-                                                value={formData.ctc}
-                                                onChange={handleInputChange}
-                                                className="input-field"
-                                                placeholder="e.g., 10-12 LPA"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold mb-2">Location</label>
-                                            <input
-                                                type="text"
-                                                name="location"
-                                                value={formData.location}
-                                                onChange={handleInputChange}
-                                                className="input-field"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-sm font-semibold mb-2">Min CGPA</label>
-                                            <input
-                                                type="number"
-                                                step="0.01"
-                                                name="minCgpa"
-                                                value={formData.minCgpa}
-                                                onChange={handleInputChange}
-                                                className="input-field"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold mb-2">Deadline</label>
-                                            <input
-                                                type="date"
-                                                name="deadline"
-                                                value={formData.deadline}
-                                                onChange={handleInputChange}
-                                                className="input-field"
-                                                required
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-semibold mb-2">Status</label>
+                                        <label className="block text-sm font-semibold mb-2">Drive Status</label>
                                         <select
                                             name="status"
                                             value={formData.status}
@@ -318,26 +504,8 @@ const AdminDrives = () => {
                                         </select>
                                     </div>
 
-                                    <div>
-                                        <label className="block text-sm font-semibold mb-2">Eligible Departments</label>
-                                        <div className="flex flex-wrap gap-2">
-                                            {departmentOptions.map(dept => (
-                                                <button
-                                                    key={dept}
-                                                    type="button"
-                                                    onClick={() => handleDepartmentToggle(dept)}
-                                                    className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${formData.departments.includes(dept)
-                                                            ? 'bg-indigo-600 text-white'
-                                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                                        }`}
-                                                >
-                                                    {dept}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div className="flex space-x-3 pt-4">
+                                    {/* Form Actions */}
+                                    <div className="flex space-x-3 pt-4 border-t">
                                         <button type="submit" className="btn-primary flex-1">
                                             {editingDrive ? 'Update Drive' : 'Create Drive'}
                                         </button>

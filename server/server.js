@@ -12,6 +12,9 @@ import authRoutes from './routes/auth.js';
 import driveRoutes from './routes/drives.js';
 import applicationRoutes from './routes/applications.js';
 import analyticsRoutes from './routes/analytics.js';
+import profileRoutes from './routes/profile.js';
+import searchRoutes from './routes/search.js';
+import exportRoutes from './routes/export.js';
 
 // Load environment variables
 dotenv.config();
@@ -51,6 +54,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/drives', driveRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/export', exportRoutes);
+
+// Serve uploaded files statically
+app.use('/uploads', express.static('uploads'));
 
 // Error handling
 app.use(notFound);
