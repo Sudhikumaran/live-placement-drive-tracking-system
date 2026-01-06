@@ -17,4 +17,4 @@ React, Tailwind CSS, Node.js, Express, and MongoDB.
 - Node.js
 - Express
 - MongoDB
-- Socket.IO
+- Socket.Io

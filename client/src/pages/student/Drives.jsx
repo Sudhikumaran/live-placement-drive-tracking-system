@@ -13,6 +13,19 @@ const StudentDrives = () => {
     const [filter, setFilter] = useState('all');
     const [applying, setApplying] = useState(null);
 
+    const filterOptions = [
+        { key: 'all', label: 'All' },
+        { key: 'upcoming', label: 'Upcoming' },
+        { key: 'ongoing', label: 'Ongoing' },
+        { key: 'closed', label: 'Closed' },
+    ];
+
+    const statusClasses = {
+        upcoming: 'badge badge-primary',
+        ongoing: 'badge badge-warning',
+        closed: 'badge badge-error',
+    };
+
     useEffect(() => {
         fetchDrives();
     }, []);
@@ -69,41 +82,21 @@ const StudentDrives = () => {
     return (
         <>
             <Navbar />
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-50 py-8">
+            <div className="min-h-screen bg-[var(--bg-secondary)] dark:bg-gray-900 py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="mb-8">
-                        <h1 className="text-4xl font-bold text-gray-900 mb-4">Placement Drives</h1>
+                        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Placement Drives</h1>
 
-                        {/* Filter Buttons */}
                         <div className="flex flex-wrap gap-3">
-                            <button
-                                onClick={() => setFilter('all')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-all ${filter === 'all' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-indigo-50'
-                                    }`}
-                            >
-                                All
-                            </button>
-                            <button
-                                onClick={() => setFilter('upcoming')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-all ${filter === 'upcoming' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-indigo-50'
-                                    }`}
-                            >
-                                Upcoming
-                            </button>
-                            <button
-                                onClick={() => setFilter('ongoing')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-all ${filter === 'ongoing' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-indigo-50'
-                                    }`}
-                            >
-                                Ongoing
-                            </button>
-                            <button
-                                onClick={() => setFilter('closed')}
-                                className={`px-4 py-2 rounded-lg font-medium transition-all ${filter === 'closed' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-indigo-50'
-                                    }`}
-                            >
-                                Closed
-                            </button>
+                            {filterOptions.map(({ key, label }) => (
+                                <button
+                                    key={key}
+                                    onClick={() => setFilter(key)}
+                                    className={`btn ${filter === key ? 'btn-primary shadow-md' : 'btn-secondary'} text-sm`}
+                                >
+                                    {label}
+                                </button>
+                            ))}
                         </div>
                     </div>
 
@@ -114,46 +107,56 @@ const StudentDrives = () => {
                     ) : (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {filteredDrives.map((drive) => (
-                                <div key={drive._id} className="card-gradient hover:scale-[1.02] transition-transform">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div>
-                                            <h3 className="text-2xl font-bold text-gray-900 mb-1">{drive.companyName}</h3>
-                                            <p className="text-lg text-gray-700 font-medium">{drive.role}</p>
+                                <div
+                                    key={drive._id}
+                                    className="card p-6 space-y-5 hover:-translate-y-1 transition-all duration-200"
+                                >
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="space-y-1">
+                                            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                                                {drive.companyName}
+                                            </h3>
+                                            <p className="text-lg text-gray-700 dark:text-gray-200 font-medium">
+                                                {drive.role}
+                                            </p>
+                                            {drive.description && (
+                                                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                                                    {drive.description}
+                                                </p>
+                                            )}
                                         </div>
-                                        <span className={`badge ${drive.status === 'upcoming' ? 'badge-info' :
-                                                drive.status === 'ongoing' ? 'badge-warning' : 'badge-danger'
-                                            } capitalize`}>
-                                            {drive.status}
+                                        <span
+                                            className={`${statusClasses[drive.status] || 'badge bg-slate-100 text-gray-700 dark:bg-slate-700 dark:text-gray-100'} capitalize`}
+                                        >
+                                            {drive.status || 'N/A'}
                                         </span>
                                     </div>
 
-                                    <p className="text-gray-600 mb-4 line-clamp-2">{drive.description}</p>
-
-                                    <div className="grid grid-cols-2 gap-4 mb-4">
+                                    <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <p className="text-sm text-gray-500">CTC</p>
-                                            <p className="font-semibold text-gray-900">{drive.ctc}</p>
+                                            <p className="font-semibold text-gray-900 dark:text-gray-100">{drive.ctc}</p>
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Location</p>
-                                            <p className="font-semibold text-gray-900">{drive.location}</p>
+                                            <p className="font-semibold text-gray-900 dark:text-gray-100">{drive.location}</p>
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Min CGPA</p>
-                                            <p className="font-semibold text-gray-900">{drive.eligibility.minCgpa}</p>
+                                            <p className="font-semibold text-gray-900 dark:text-gray-100">{drive.eligibility?.minCgpa ?? '—'}</p>
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500">Deadline</p>
-                                            <p className="font-semibold text-gray-900">
-                                                {new Date(drive.deadline).toLocaleDateString()}
+                                            <p className="font-semibold text-gray-900 dark:text-gray-100">
+                                                {drive.deadline ? new Date(drive.deadline).toLocaleDateString() : '—'}
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div className="mb-4">
-                                        <p className="text-sm text-gray-500 mb-2">Eligible Departments</p>
+                                    <div className="space-y-2">
+                                        <p className="text-sm text-gray-500">Eligible Departments</p>
                                         <div className="flex flex-wrap gap-2">
-                                            {drive.eligibility.departments.map((dept, idx) => (
+                                            {(drive.eligibility?.departments || []).map((dept, idx) => (
                                                 <span key={idx} className="badge badge-primary text-xs">
                                                     {dept}
                                                 </span>
@@ -162,11 +165,14 @@ const StudentDrives = () => {
                                     </div>
 
                                     {drive.rounds && drive.rounds.length > 0 && (
-                                        <div className="mb-4">
-                                            <p className="text-sm text-gray-500 mb-2">Rounds</p>
+                                        <div className="space-y-2">
+                                            <p className="text-sm text-gray-500">Rounds</p>
                                             <div className="flex flex-wrap gap-2">
                                                 {drive.rounds.map((round, idx) => (
-                                                    <span key={idx} className="badge bg-gray-100 text-gray-700 text-xs">
+                                                    <span
+                                                        key={idx}
+                                                        className="badge bg-slate-100 text-gray-700 dark:bg-slate-700 dark:text-gray-100 text-xs"
+                                                    >
                                                         {round.name}
                                                     </span>
                                                 ))}
@@ -177,7 +183,7 @@ const StudentDrives = () => {
                                     <button
                                         onClick={() => handleApply(drive._id)}
                                         disabled={drive.status === 'closed' || applying === drive._id}
-                                        className="w-full btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                                        className="w-full btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         {applying === drive._id ? 'Applying...' :
                                             drive.status === 'closed' ? 'Closed' : 'Apply Now'}

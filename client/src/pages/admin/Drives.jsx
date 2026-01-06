@@ -206,13 +206,13 @@ const AdminDrives = () => {
     return (
         <>
             <Navbar />
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-50 py-8">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between mb-8">
-                        <h1 className="text-4xl font-bold text-gray-900">Manage Drives</h1>
+                        <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Manage Drives</h1>
                         <button
                             onClick={() => { setShowModal(true); setEditingDrive(null); resetForm(); }}
-                            className="btn-primary"
+                            className="btn btn-primary"
                         >
                             + Create Drive
                         </button>
@@ -220,28 +220,28 @@ const AdminDrives = () => {
 
                     <div className="grid grid-cols-1 gap-6">
                         {drives.map((drive) => (
-                            <div key={drive._id} className="card-gradient">
+                            <div key={drive._id} className="card p-6">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex-1">
-                                        <h3 className="text-2xl font-bold text-gray-900 mb-1">{drive.companyName}</h3>
-                                        <p className="text-lg text-gray-700">{drive.role}</p>
-                                        <p className="text-sm text-gray-600 mt-2">{drive.description}</p>
+                                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{drive.companyName}</h3>
+                                        <p className="text-lg text-gray-700 dark:text-gray-300 mb-1">{drive.role}</p>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{drive.description}</p>
                                     </div>
-                                    <div className="flex items-center space-x-2">
-                                        <span className={`badge ${drive.status === 'upcoming' ? 'badge-info' :
-                                                drive.status === 'ongoing' ? 'badge-warning' : 'badge-danger'
+                                    <div className="flex items-center space-x-3">
+                                        <span className={`badge ${drive.status === 'upcoming' ? 'badge-primary' :
+                                                drive.status === 'ongoing' ? 'badge-warning' : 'badge-error'
                                             } capitalize`}>
                                             {drive.status}
                                         </span>
                                         <button
                                             onClick={() => handleEdit(drive)}
-                                            className="px-3 py-1 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700"
+                                            className="btn btn-primary text-sm px-3 py-1"
                                         >
                                             Edit
                                         </button>
                                         <button
                                             onClick={() => handleDelete(drive._id)}
-                                            className="px-3 py-1 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700"
+                                            className="btn btn-secondary text-sm px-3 py-1"
                                         >
                                             Delete
                                         </button>
@@ -271,11 +271,11 @@ const AdminDrives = () => {
 
                                 {/* Display Rounds */}
                                 {drive.rounds && drive.rounds.length > 0 && (
-                                    <div className="mt-4 pt-4 border-t border-gray-200">
-                                        <p className="text-sm font-semibold text-gray-700 mb-2">Rounds ({drive.rounds.length}):</p>
+                                    <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                        <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Rounds ({drive.rounds.length}):</p>
                                         <div className="flex flex-wrap gap-2">
                                             {drive.rounds.map((round, idx) => (
-                                                <div key={idx} className="badge bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                <div key={idx} className="badge bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50">
                                                     {round.name}
                                                     {round.date && ` - ${new Date(round.date).toLocaleDateString()}`}
                                                 </div>
@@ -290,14 +290,14 @@ const AdminDrives = () => {
                     {/* Enhanced Modal */}
                     {showModal && (
                         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-                            <div className="bg-white rounded-xl p-6 max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto">
-                                <h2 className="text-2xl font-bold mb-6">
+                            <div className="bg-white dark:bg-gray-800 rounded-xl p-8 max-w-4xl w-full my-8 max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700">
+                                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                                     {editingDrive ? 'Edit Drive' : 'Create New Drive'}
                                 </h2>
 
                                 <form onSubmit={handleSubmit} className="space-y-6">
                                     {/* Company Details Section */}
-                                    <div className="bg-gray-50 p-4 rounded-lg">
+                                    <div className="bg-gray-50 dark:bg-gray-900 p-5 rounded-lg border border-gray-200 dark:border-gray-700">
                                         <h3 className="text-lg font-semibold mb-4 text-gray-900">Company Details</h3>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div>
@@ -426,11 +426,11 @@ const AdminDrives = () => {
                                     {/* Rounds Section */}
                                     <div className="bg-green-50 p-4 rounded-lg">
                                         <div className="flex items-center justify-between mb-4">
-                                            <h3 className="text-lg font-semibold text-gray-900">Selection Rounds</h3>
+                                            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Selection Rounds</h3>
                                             <button
                                                 type="button"
                                                 onClick={addRound}
-                                                className="px-3 py-1 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700"
+                                                className="btn btn-primary text-sm px-3 py-1"
                                             >
                                                 + Add Round
                                             </button>
@@ -438,14 +438,14 @@ const AdminDrives = () => {
 
                                         <div className="space-y-3">
                                             {formData.rounds.map((round, index) => (
-                                                <div key={index} className="bg-white p-4 rounded-lg border border-green-200">
+                                                <div key={index} className="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600">
                                                     <div className="flex items-start justify-between mb-3">
-                                                        <h4 className="font-semibold text-gray-700">Round {index + 1}</h4>
+                                                        <h4 className="font-semibold text-gray-700 dark:text-white">Round {index + 1}</h4>
                                                         {formData.rounds.length > 1 && (
                                                             <button
                                                                 type="button"
                                                                 onClick={() => removeRound(index)}
-                                                                className="text-red-600 hover:text-red-700 text-sm"
+                                                                className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 text-sm font-medium"
                                                             >
                                                                 ✕ Remove
                                                             </button>
@@ -505,14 +505,14 @@ const AdminDrives = () => {
                                     </div>
 
                                     {/* Form Actions */}
-                                    <div className="flex space-x-3 pt-4 border-t">
-                                        <button type="submit" className="btn-primary flex-1">
+                                    <div className="flex space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+                                        <button type="submit" className="btn btn-primary flex-1">
                                             {editingDrive ? 'Update Drive' : 'Create Drive'}
                                         </button>
                                         <button
                                             type="button"
                                             onClick={() => { setShowModal(false); setEditingDrive(null); }}
-                                            className="btn-secondary flex-1"
+                                            className="btn btn-secondary flex-1"
                                         >
                                             Cancel
                                         </button>

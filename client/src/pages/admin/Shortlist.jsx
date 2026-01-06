@@ -71,46 +71,44 @@ const AdminShortlist = () => {
     return (
         <>
             <Navbar />
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-50 py-8">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-8">Upload Shortlist</h1>
+                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">Upload Shortlist</h1>
 
-                    <div className="card-gradient">
+                    <div className="card p-6">
                         <div className="mb-6">
-                            <h2 className="text-xl font-bold text-gray-900 mb-2">Instructions</h2>
-                            <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4 text-sm text-gray-700 space-y-2">
-                                <p>• Your Excel file should have the following columns: <strong>Email</strong>, <strong>Status</strong></p>
-                                <p>• Status values: <strong>shortlisted</strong>, <strong>rejected</strong>, <strong>selected</strong>, <strong>pending</strong></p>
-                                <p>• Example:</p>
-                                <div className="mt-2 bg-white rounded p-2 font-mono text-xs overflow-x-auto">
+                            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Instructions</h2>
+                            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg p-5 text-sm text-gray-700 dark:text-gray-300 space-y-3">
+                                <p className="flex items-start"><span className="mr-3">•</span><span>Your Excel file should have the following columns: <strong>Email</strong>, <strong>Status</strong></span></p>
+                                <p className="flex items-start"><span className="mr-3">•</span><span>Status values: <strong>shortlisted</strong>, <strong>rejected</strong>, <strong>selected</strong>, <strong>pending</strong></span></p>
+                                <p className="flex items-start"><span className="mr-3">•</span><span>Example:</span></p>
+                                <div className="mt-2 bg-white dark:bg-gray-800 rounded p-3 font-mono text-xs overflow-x-auto border border-gray-200 dark:border-gray-700">
                                     <table className="w-full">
                                         <thead>
-                                            <tr className="border-b">
-                                                <th className="text-left p-2">Email</th>
-                                                <th className="text-left p-2">Status</th>
+                                            <tr className="border-b border-gray-300 dark:border-gray-600">
+                                                <th className="text-left p-2 text-gray-900 dark:text-white">Email</th>
+                                                <th className="text-left p-2 text-gray-900 dark:text-white">Status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr className="border-b">
-                                                <td className="p-2">student1@college.edu</td>
-                                                <td className="p-2">shortlisted</td>
+                                            <tr className="border-b border-gray-300 dark:border-gray-600">
+                                                <td className="p-2 text-gray-700 dark:text-gray-300">student1@college.edu</td>
+                                                <td className="p-2 text-gray-700 dark:text-gray-300">shortlisted</td>
                                             </tr>
                                             <tr>
-                                                <td className="p-2">student2@college.edu</td>
-                                                <td className="p-2">rejected</td>
+                                                <td className="p-2 text-gray-700 dark:text-gray-300">student2@college.edu</td>
+                                                <td className="p-2 text-gray-700 dark:text-gray-300">rejected</td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                                <p className="mt-3 text-indigo-700 font-semibold">
-                                    ⚡ Real-time notifications will be sent to all affected students!
-                                </p>
+                                <p className="mt-3 text-blue-700 dark:text-blue-400 font-semibold flex items-start"><span className="mr-2">⚡</span><span>Real-time notifications will be sent to all affected students!</span></p>
                             </div>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
                                     Select Placement Drive
                                 </label>
                                 <select
@@ -129,7 +127,7 @@ const AdminShortlist = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
                                     Round Name
                                 </label>
                                 <input
@@ -143,13 +141,13 @@ const AdminShortlist = () => {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
                                     Upload Excel File (.xlsx)
                                 </label>
-                                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-indigo-400 transition-colors">
+                                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition-colors">
                                     <div className="space-y-1 text-center">
                                         <svg
-                                            className="mx-auto h-12 w-12 text-gray-400"
+                                            className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
                                             stroke="currentColor"
                                             fill="none"
                                             viewBox="0 0 48 48"
@@ -161,10 +159,10 @@ const AdminShortlist = () => {
                                                 strokeLinejoin="round"
                                             />
                                         </svg>
-                                        <div className="flex text-sm text-gray-600">
+                                        <div className="flex text-sm text-gray-600 dark:text-gray-400">
                                             <label
                                                 htmlFor="file-input"
-                                                className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500"
+                                                className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
                                             >
                                                 <span>Upload a file</span>
                                                 <input
@@ -178,7 +176,7 @@ const AdminShortlist = () => {
                                             </label>
                                             <p className="pl-1">or drag and drop</p>
                                         </div>
-                                        <p className="text-xs text-gray-500">Excel file (.xlsx) only</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-500">Excel file (.xlsx) only</p>
                                         {file && (
                                             <p className="text-sm text-green-600 font-semibold mt-2">
                                                 ✓ {file.name}
@@ -191,7 +189,7 @@ const AdminShortlist = () => {
                             <button
                                 type="submit"
                                 disabled={uploading}
-                                className="w-full btn-primary"
+                                className="btn btn-primary w-full"
                             >
                                 {uploading ? (
                                     <span className="flex items-center justify-center">

@@ -53,24 +53,17 @@ const SearchBar = () => {
         setIsOpen(false);
         setQuery('');
         if (result.type === 'drive') {
-            navigate('/student/drives'); // or admin/drives based on role
+            navigate('/student/drives');
         }
     };
 
     const totalResults = results.drives.length + results.students.length;
 
     return (
-        <div ref={searchRef} className="relative w-full max-w-md">
+        <div ref={searchRef} className="relative w-full max-w-md hidden sm:block">
             <div className="relative">
-                <input
-                    type="text"
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search drives, companies..."
-                    className="w-full px-4 py-2 pl-10 pr-4 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors"
-                />
                 <svg
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -82,45 +75,52 @@ const SearchBar = () => {
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                     />
                 </svg>
+                <input
+                    type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onFocus={() => query.length > 2 && setIsOpen(true)}
+                    placeholder="Search drives, companies..."
+                    className="input-field pl-10"
+                />
                 {loading && (
                     <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                        <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 )}
             </div>
 
             {/* Search Results Dropdown */}
             {isOpen && totalResults > 0 && (
-                <div className="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 max-h-96 overflow-y-auto">
+                <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 max-h-96 overflow-y-auto">
                     {/* Drives */}
                     {results.drives.length > 0 && (
                         <div>
-                            <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                            <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600">
                                 <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">
-                                    Placement Drives ({results.drives.length})
+                                    Drives ({results.drives.length})
                                 </h3>
                             </div>
                             {results.drives.map((drive) => (
                                 <button
                                     key={drive.id}
                                     onClick={() => handleResultClick(drive)}
-                                    className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-0"
+                                    className="w-full px-4 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-0"
                                 >
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <p className="font-medium text-gray-900 dark:text-white">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex-1 min-w-0">
+                                            <p className="font-medium text-gray-900 dark:text-white text-sm truncate">
                                                 {drive.title}
                                             </p>
-                                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                            <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 truncate">
                                                 {drive.subtitle}
                                             </p>
                                         </div>
-                                        <span
-                                            className={`ml-2 px-2 py-1 text-xs font-semibold rounded ${drive.status === 'ongoing'
-                                                    ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300'
+                                        <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full whitespace-nowrap ${drive.status === 'ongoing'
+                                                    ? 'badge-success'
                                                     : drive.status === 'upcoming'
-                                                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300'
-                                                        : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                                                        ? 'badge-primary'
+                                                        : 'bg-slate-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300'
                                                 }`}
                                         >
                                             {drive.status}
@@ -134,7 +134,7 @@ const SearchBar = () => {
                     {/* Students (Admin only) */}
                     {results.students.length > 0 && (
                         <div>
-                            <div className="px-4 py-2 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
+                            <div className="px-4 py-2 bg-slate-50 dark:bg-slate-700 border-b border-slate-200 dark:border-slate-600">
                                 <h3 className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">
                                     Students ({results.students.length})
                                 </h3>
@@ -143,12 +143,12 @@ const SearchBar = () => {
                                 <button
                                     key={student.id}
                                     onClick={() => handleResultClick(student)}
-                                    className="w-full px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-0"
+                                    className="w-full px-4 py-2.5 text-left hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors border-b border-slate-100 dark:border-slate-700 last:border-0"
                                 >
-                                    <p className="font-medium text-gray-900 dark:text-white">
+                                    <p className="font-medium text-gray-900 dark:text-white text-sm">
                                         {student.title}
                                     </p>
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
                                         {student.subtitle}
                                     </p>
                                 </button>
@@ -160,8 +160,8 @@ const SearchBar = () => {
 
             {/* No Results */}
             {isOpen && query.trim().length > 2 && totalResults === 0 && !loading && (
-                <div className="absolute z-50 w-full mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-4">
-                    <p className="text-center text-gray-500 dark:text-gray-400">
+                <div className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 p-4">
+                    <p className="text-center text-sm text-gray-500 dark:text-gray-400">
                         No results found for "{query}"
                     </p>
                 </div>

@@ -174,6 +174,37 @@ export const getDashboardOverview = async (req, res) => {
             finalStatus: 'selected'
         });
 
+        // Drive-wise application counts
+        const driveApplicationCounts = await Application.aggregate([
+            {
+                $group: {
+                    _id: '$driveId',
+                    totalApplicants: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Fetch drive metadata for the aggregated IDs
+        const driveIds = driveApplicationCounts.map((d) => d._id).filter(Boolean);
+        const drivesMeta = await PlacementDrive.find({ _id: { $in: driveIds } })
+            .select('companyName role status ctc');
+        const driveMetaMap = new Map(drivesMeta.map((d) => [d._id.toString(), d]));
+
+        const driveApplicants = driveApplicationCounts
+            .map((item) => {
+                const meta = driveMetaMap.get(item._id.toString());
+                return meta ? {
+                    driveId: meta._id,
+                    companyName: meta.companyName,
+                    role: meta.role,
+                    status: meta.status,
+                    ctc: meta.ctc,
+                    totalApplicants: item.totalApplicants
+                } : null;
+            })
+            .filter(Boolean)
+            .sort((a, b) => b.totalApplicants - a.totalApplicants);
+
         // Recent activities
         const recentApplications = await Application.find()
             .populate('studentId', 'name email')
@@ -192,6 +223,7 @@ export const getDashboardOverview = async (req, res) => {
                 placementPercentage: totalStudents > 0 ?
                     ((placedStudents.length / totalStudents) * 100).toFixed(2) : 0
             },
+            driveApplicants,
             recentActivities: recentApplications
         });
     } catch (error) {
@@ -199,6 +231,45 @@ export const getDashboardOverview = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to fetch dashboard overview',
+            error: error.message
+        });
+    }
+};
+
+// Get all drives with applicant counts
+export const getDriveApplicantsSummary = async (req, res) => {
+    try {
+        const drives = await PlacementDrive.find().select('companyName role status ctc');
+
+        const applicationCounts = await Application.aggregate([
+            {
+                $group: {
+                    _id: '$driveId',
+                    totalApplicants: { $sum: 1 }
+                }
+            }
+        ]);
+
+        const countMap = new Map(applicationCounts.map((d) => [d._id?.toString(), d.totalApplicants]));
+
+        const payload = drives.map((drive) => ({
+            driveId: drive._id,
+            companyName: drive.companyName,
+            role: drive.role,
+            status: drive.status,
+            ctc: drive.ctc,
+            totalApplicants: countMap.get(drive._id.toString()) || 0
+        })).sort((a, b) => b.totalApplicants - a.totalApplicants);
+
+        res.status(200).json({
+            success: true,
+            drives: payload
+        });
+    } catch (error) {
+        console.error('Get drive applicants summary error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to fetch drive applicants summary',
             error: error.message
         });
     }

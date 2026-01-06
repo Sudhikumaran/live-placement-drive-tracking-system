@@ -1,6 +1,9 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import connectDB from './config/db.js';
@@ -32,13 +35,30 @@ app.use((req, res, next) => {
     next();
 });
 
-// Middleware
-app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+// Security & logging middleware
+app.set('trust proxy', 1);
+app.use(helmet());
+
+const corsOptions = {
+    origin: process.env.CLIENT_URL?.split(',') || ['http://localhost:5173'],
     credentials: true
-}));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+};
+app.use(cors(corsOptions));
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 300,
+    standardHeaders: true,
+    legacyHeaders: false
+});
+app.use('/api', limiter);
+
+if (process.env.NODE_ENV !== 'test') {
+    app.use(morgan('dev'));
+}
+
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(cookieParser());
 
 // Routes

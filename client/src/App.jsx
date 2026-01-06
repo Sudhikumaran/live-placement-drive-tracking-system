@@ -19,6 +19,7 @@ import AdminDashboard from './pages/admin/Dashboard';
 import AdminDrives from './pages/admin/Drives';
 import AdminShortlist from './pages/admin/Shortlist';
 import AdminAnalytics from './pages/admin/Analytics';
+import AdminApplicants from './pages/admin/Applicants';
 
 function App() {
   return (
@@ -120,6 +121,14 @@ function App() {
               element={
                 <ProtectedRoute requiredRole="admin">
                   <AdminAnalytics />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/applicants"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminApplicants />
                 </ProtectedRoute>
               }
             />

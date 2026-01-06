@@ -32,7 +32,7 @@ const AdminAnalytics = () => {
         }
     };
 
-    const COLORS = ['#6366f1', '#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+    const COLORS = ['#7c3aed', '#2563eb', '#06b6d4', '#ec4899', '#8b5cf6', '#10b981'];
 
     if (loading) {
         return (
@@ -48,28 +48,28 @@ const AdminAnalytics = () => {
     return (
         <>
             <Navbar />
-            <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-blue-50 dark:from-gray-900 dark:via-indigo-950 dark:to-blue-950 py-8 transition-colors duration-300">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-8">Analytics Dashboard</h1>
 
                     {/* Overall Stats */}
                     {studentStats && (
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                            <div className="card-gradient">
-                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Students</p>
-                                <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{studentStats.totalStudents}</p>
+                            <div className="card p-6">
+                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Total Students</p>
+                                <p className="text-3xl font-bold text-gray-900 dark:text-white">{studentStats.totalStudents}</p>
                             </div>
-                            <div className="card-gradient">
-                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Placed Students</p>
-                                <p className="text-3xl font-bold text-green-600 dark:text-green-400">{studentStats.placedCount}</p>
+                            <div className="card p-6">
+                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Placed Students</p>
+                                <p className="text-3xl font-bold text-gray-900 dark:text-white">{studentStats.placedCount}</p>
                             </div>
-                            <div className="card-gradient">
-                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Placement Rate</p>
-                                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{studentStats.placementPercentage}%</p>
+                            <div className="card p-6">
+                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Placement Rate</p>
+                                <p className="text-3xl font-bold text-gray-900 dark:text-white">{studentStats.placementPercentage}%</p>
                             </div>
-                            <div className="card-gradient">
-                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">Total Applications</p>
-                                <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{studentStats.totalApplications}</p>
+                            <div className="card p-6">
+                                <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Total Applications</p>
+                                <p className="text-3xl font-bold text-gray-900 dark:text-white">{studentStats.totalApplications}</p>
                             </div>
                         </div>
                     )}
