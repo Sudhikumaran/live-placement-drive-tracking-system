@@ -50,8 +50,6 @@ const corsOptions = {
     optionsSuccessStatus: 204
 };
 app.use(cors(corsOptions));
-// Ensure preflight (OPTIONS) requests return 204 instead of redirecting
-app.options('*', cors(corsOptions));
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
