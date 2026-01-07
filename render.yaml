@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: placement-tracker-server
+    runtime: node
+    plan: starter
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: placement-db
+          property: connectionString
+      - key: JWT_SECRET
+        sync: false
+      - key: CLIENT_URL
+        value: https://placement-tracker.onrender.com
+      - key: LOG_LEVEL
+        value: info
+
+databases:
+  - name: placement-db
+    engine: mongodb
+    plan: starter
+    ipAllowList: []
+
+staticSites:
+  - name: placement-tracker-client
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: client/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://placement-tracker-server.onrender.com
