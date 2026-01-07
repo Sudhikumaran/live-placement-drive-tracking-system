@@ -221,32 +221,49 @@ const AdminDrives = () => {
                     <div className="grid grid-cols-1 gap-6">
                         {drives.map((drive) => (
                             <div key={drive._id} className="card p-6">
-                                <div className="flex items-start justify-between mb-4">
-                                    <div className="flex-1">
-                                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{drive.companyName}</h3>
-                                        <p className="text-lg text-gray-700 dark:text-gray-300 mb-1">{drive.role}</p>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{drive.description}</p>
-                                    </div>
-                                    <div className="flex items-center space-x-3">
-                                        <span className={`badge ${drive.status === 'upcoming' ? 'badge-primary' :
-                                                drive.status === 'ongoing' ? 'badge-warning' : 'badge-error'
-                                            } capitalize`}>
-                                            {drive.status}
-                                        </span>
-                                        <button
-                                            onClick={() => handleEdit(drive)}
-                                            className="btn btn-primary text-sm px-3 py-1"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(drive._id)}
-                                            className="btn btn-secondary text-sm px-3 py-1"
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
+                                {(() => {
+                                    const deadlineDate = drive.deadline ? new Date(drive.deadline) : null;
+                                    const now = Date.now();
+                                    const msDiff = deadlineDate ? deadlineDate.getTime() - now : null;
+                                    const isPast = msDiff !== null && msDiff < 0;
+                                    const isSoon = msDiff !== null && msDiff <= 3 * 24 * 60 * 60 * 1000 && msDiff >= 0;
+                                    const daysLeft = msDiff !== null ? Math.max(0, Math.ceil(msDiff / (24 * 60 * 60 * 1000))) : null;
+
+                                    return (
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="flex-1">
+                                                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">{drive.companyName}</h3>
+                                                <p className="text-lg text-gray-700 dark:text-gray-300 mb-1">{drive.role}</p>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{drive.description}</p>
+                                                {deadlineDate && (
+                                                    <div className="mt-2 flex flex-wrap gap-2 text-sm">
+                                                        {isPast && <span className="badge bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200">Deadline passed</span>}
+                                                        {isSoon && !isPast && <span className="badge bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-200">Deadline in {Math.max(1, daysLeft)} days</span>}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex items-center space-x-3">
+                                                <span className={`badge ${drive.status === 'upcoming' ? 'badge-primary' :
+                                                        drive.status === 'ongoing' ? 'badge-warning' : 'badge-error'
+                                                    } capitalize`}>
+                                                    {drive.status}
+                                                </span>
+                                                <button
+                                                    onClick={() => handleEdit(drive)}
+                                                    className="btn btn-primary text-sm px-3 py-1"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(drive._id)}
+                                                    className="btn btn-secondary text-sm px-3 py-1"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
 
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                                     <div>

@@ -73,8 +73,8 @@ const MyApplications = () => {
                     ) : (
                         <div className="space-y-6">
                             {applications.map((app) => (
-                                <div key={app._id} className="card-gradient">
-                                    <div className="flex items-start justify-between mb-4">
+                                <div key={app._id} className="card-gradient p-6 sm:p-7 lg:p-8 space-y-6">
+                                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                                         <div>
                                             <h3 className="text-2xl font-bold text-gray-900 mb-1">
                                                 {app.driveId?.companyName}
@@ -84,7 +84,7 @@ const MyApplications = () => {
                                                 Applied on {new Date(app.appliedAt).toLocaleDateString()}
                                             </p>
                                         </div>
-                                        <span className={`badge ${getStatusBadge(app.finalStatus)} capitalize text-sm`}>
+                                        <span className={`self-start badge ${getStatusBadge(app.finalStatus)} capitalize text-sm`}> 
                                             {app.finalStatus}
                                         </span>
                                     </div>
@@ -95,7 +95,7 @@ const MyApplications = () => {
                                             <h4 className="font-semibold text-gray-900 mb-3">Round Progress</h4>
                                             <div className="space-y-3">
                                                 {app.roundStatus.map((round, idx) => (
-                                                    <div key={idx} className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200">
+                                                    <div key={idx} className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200">
                                                         <div className="flex items-center space-x-3">
                                                             <div className={`w-10 h-10 rounded-full flex items-center justify-center ${round.status === 'selected' || round.status === 'shortlisted' ? 'bg-green-100' :
                                                                     round.status === 'rejected' ? 'bg-red-100' : 'bg-gray-100'
@@ -121,7 +121,8 @@ const MyApplications = () => {
                                                                 </p>
                                                             </div>
                                                         </div>
-                                                        <span className={`badge ${getStatusBadge(round.status)} capitalize`}>
+                                                        <span className={`badge ${getStatusBadge(round.status)} capitalize`}
+                                                        >
                                                             {round.status}
                                                         </span>
                                                     </div>
@@ -131,7 +132,7 @@ const MyApplications = () => {
                                     )}
 
                                     {/* Company Details */}
-                                    <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-2 gap-4">
+                                    <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div>
                                             <p className="text-sm text-gray-500">CTC</p>
                                             <p className="font-semibold text-gray-900">{app.driveId?.ctc}</p>

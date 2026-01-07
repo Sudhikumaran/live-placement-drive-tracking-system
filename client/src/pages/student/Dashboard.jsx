@@ -11,8 +11,10 @@ const StudentDashboard = () => {
     const { user } = useAuth();
     const { notifications } = useSocket();
     const [stats, setStats] = useState({ applied: 0, shortlisted: 0, offers: 0 });
+    const [shortlistedApps, setShortlistedApps] = useState([]);
     const [upcomingDrives, setUpcomingDrives] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [appliedDriveIds, setAppliedDriveIds] = useState(new Set());
 
     useEffect(() => {
         fetchDashboardData();
@@ -28,12 +30,15 @@ const StudentDashboard = () => {
 
             // Calculate stats
             const applied = applications.length;
-            const shortlisted = applications.filter(app =>
+            const shortlistedList = applications.filter(app =>
                 app.roundStatus.some(r => r.status === 'shortlisted')
-            ).length;
+            );
+            const shortlisted = shortlistedList.length;
             const offers = applications.filter(app => app.finalStatus === 'selected').length;
 
             setStats({ applied, shortlisted, offers });
+            setShortlistedApps(shortlistedList);
+            setAppliedDriveIds(new Set(applications.map(a => a.driveId?._id).filter(Boolean)));
 
             // Fetch upcoming drives
             const drivesResponse = await api.get('/drives?status=upcoming');
@@ -140,21 +145,75 @@ const StudentDashboard = () => {
                             </div>
                         ) : (
                             <div className="space-y-3">
-                                {upcomingDrives.map((drive) => (
-                                    <div key={drive._id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-gray-300 dark:hover:border-gray-600 transition-all">
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex-1 min-w-0">
-                                                <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">{drive.companyName}</h3>
-                                                <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{drive.role}</p>
-                                                <div className="flex flex-wrap gap-2">
-                                                    <span className="badge badge-primary text-xs">{drive.ctc}</span>
-                                                    <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs">{drive.location}</span>
+                                {upcomingDrives.map((drive) => {
+                                    const deadlineDate = drive.deadline ? new Date(drive.deadline) : null;
+                                    const now = Date.now();
+                                    const msDiff = deadlineDate ? deadlineDate.getTime() - now : null;
+                                    const isPast = msDiff !== null && msDiff < 0;
+                                    const isSoon = msDiff !== null && msDiff <= 3 * 24 * 60 * 60 * 1000 && msDiff >= 0;
+                                    const daysLeft = msDiff !== null ? Math.max(1, Math.ceil(msDiff / (24 * 60 * 60 * 1000))) : null;
+                                    const isApplied = appliedDriveIds.has(drive._id);
+
+                                    return (
+                                        <div key={drive._id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:border-gray-300 dark:hover:border-gray-600 transition-all">
+                                            <div className="flex items-start justify-between">
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">{drive.companyName}</h3>
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">{drive.role}</p>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        <span className="badge badge-primary text-xs">{drive.ctc}</span>
+                                                        <span className="badge bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs">{drive.location}</span>
+                                                        {isApplied && (
+                                                            <span className="badge bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-xs">Applied</span>
+                                                        )}
+                                                        {isSoon && !isApplied && !isPast && (
+                                                            <span className="badge bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-200 text-xs">Deadline in {daysLeft} days</span>
+                                                        )}
+                                                        {isPast && (
+                                                            <span className="badge bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200 text-xs">Deadline passed</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                                <div className="ml-4 whitespace-nowrap">
+                                                    {isApplied || isPast ? (
+                                                        <Link to="/student/drives" className="btn btn-secondary text-sm px-4 py-2">View</Link>
+                                                    ) : (
+                                                        <Link to="/student/drives" className="btn btn-primary text-sm px-4 py-2">Apply</Link>
+                                                    )}
                                                 </div>
                                             </div>
-                                            <Link to="/student/drives" className="btn btn-primary ml-4 text-sm px-4 py-2 whitespace-nowrap">
-                                                Apply
-                                            </Link>
                                         </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Shortlisted Drives */}
+                    <div className="card p-6 mt-8 animate-fade-in">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-lg font-bold text-gray-900 dark:text-white">Shortlisted Drives</h2>
+                            <Link to="/student/applications" className="text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 text-sm font-semibold">
+                                View All →
+                            </Link>
+                        </div>
+
+                        {shortlistedApps.length === 0 ? (
+                            <div className="text-center py-8 text-gray-600 dark:text-gray-400">
+                                You are not shortlisted in any drives yet.
+                            </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {shortlistedApps.slice(0, 5).map((app) => (
+                                    <div key={app._id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex items-center justify-between hover:border-gray-300 dark:hover:border-gray-600 transition-all">
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="text-base font-semibold text-gray-900 dark:text-white truncate">{app.driveId?.companyName}</h3>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{app.driveId?.role}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Round status: shortlisted</p>
+                                        </div>
+                                        <Link to="/student/applications" className="btn btn-ghost text-sm font-semibold px-3 py-2 whitespace-nowrap">
+                                            View
+                                        </Link>
                                     </div>
                                 ))}
                             </div>

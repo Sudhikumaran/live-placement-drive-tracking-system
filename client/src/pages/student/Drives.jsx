@@ -12,6 +12,7 @@ const StudentDrives = () => {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('all');
     const [applying, setApplying] = useState(null);
+    const [appliedDriveIds, setAppliedDriveIds] = useState(new Set());
 
     const filterOptions = [
         { key: 'all', label: 'All' },
@@ -28,6 +29,7 @@ const StudentDrives = () => {
 
     useEffect(() => {
         fetchDrives();
+        fetchApplications();
     }, []);
 
     useEffect(() => {
@@ -46,6 +48,16 @@ const StudentDrives = () => {
         }
     };
 
+    const fetchApplications = async () => {
+        try {
+            const response = await api.get('/applications/my-applications');
+            const appliedIds = new Set(response.data.applications.map((app) => app.driveId?._id).filter(Boolean));
+            setAppliedDriveIds(appliedIds);
+        } catch (error) {
+            console.error('Error fetching applications:', error);
+        }
+    };
+
     const filterDrives = () => {
         if (filter === 'all') {
             setFilteredDrives(drives);
@@ -60,6 +72,7 @@ const StudentDrives = () => {
             await api.post('/applications/apply', { driveId });
             toast.success('Application submitted successfully!');
             fetchDrives();
+            fetchApplications();
         } catch (error) {
             const message = error.response?.data?.message || 'Failed to apply';
             toast.error(message);
@@ -111,27 +124,48 @@ const StudentDrives = () => {
                                     key={drive._id}
                                     className="card p-6 space-y-5 hover:-translate-y-1 transition-all duration-200"
                                 >
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div className="space-y-1">
-                                            <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
-                                                {drive.companyName}
-                                            </h3>
-                                            <p className="text-lg text-gray-700 dark:text-gray-200 font-medium">
-                                                {drive.role}
-                                            </p>
-                                            {drive.description && (
-                                                <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
-                                                    {drive.description}
-                                                </p>
-                                            )}
-                                        </div>
-                                        <span
-                                            className={`${statusClasses[drive.status] || 'badge bg-slate-100 text-gray-700 dark:bg-slate-700 dark:text-gray-100'} capitalize`}
-                                        >
-                                            {drive.status || 'N/A'}
-                                        </span>
-                                    </div>
+                                    {(() => {
+                                        const deadlineDate = drive.deadline ? new Date(drive.deadline) : null;
+                                        const now = Date.now();
+                                        const msDiff = deadlineDate ? deadlineDate.getTime() - now : null;
+                                        const isPast = msDiff !== null && msDiff < 0;
+                                        const isSoon = msDiff !== null && msDiff <= 3 * 24 * 60 * 60 * 1000 && msDiff >= 0;
+                                        const isApplied = appliedDriveIds.has(drive._id);
 
+                                        return (
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div className="space-y-1">
+                                                    <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">
+                                                        {drive.companyName}
+                                                    </h3>
+                                                    <p className="text-lg text-gray-700 dark:text-gray-200 font-medium">
+                                                        {drive.role}
+                                                    </p>
+                                                    {drive.description && (
+                                                        <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">
+                                                            {drive.description}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-col items-end space-y-2">
+                                                    <span
+                                                        className={`${statusClasses[drive.status] || 'badge bg-slate-100 text-gray-700 dark:bg-slate-700 dark:text-gray-100'} capitalize`}
+                                                    >
+                                                        {drive.status || 'N/A'}
+                                                    </span>
+                                                    {isApplied && (
+                                                        <span className="badge bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">Applied</span>
+                                                    )}
+                                                    {isSoon && !isApplied && (
+                                                        <span className="badge bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200">Deadline in {Math.max(1, Math.ceil(msDiff / (24 * 60 * 60 * 1000)))} days</span>
+                                                    )}
+                                                    {isPast && (
+                                                        <span className="badge bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-200">Deadline passed</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })()}
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <p className="text-sm text-gray-500">CTC</p>
@@ -180,14 +214,40 @@ const StudentDrives = () => {
                                         </div>
                                     )}
 
-                                    <button
-                                        onClick={() => handleApply(drive._id)}
-                                        disabled={drive.status === 'closed' || applying === drive._id}
-                                        className="w-full btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {applying === drive._id ? 'Applying...' :
-                                            drive.status === 'closed' ? 'Closed' : 'Apply Now'}
-                                    </button>
+                                    {(() => {
+                                        const deadlineDate = drive.deadline ? new Date(drive.deadline) : null;
+                                        const now = Date.now();
+                                        const msDiff = deadlineDate ? deadlineDate.getTime() - now : null;
+                                        const isPast = msDiff !== null && msDiff < 0;
+                                        const isSoon = msDiff !== null && msDiff <= 3 * 24 * 60 * 60 * 1000 && msDiff >= 0;
+                                        const isApplied = appliedDriveIds.has(drive._id);
+                                        const disableApply = drive.status === 'closed' || isPast || isApplied || applying === drive._id;
+
+                                        return (
+                                            <div className="space-y-2">
+                                                {isSoon && !isApplied && !isPast && (
+                                                    <div className="text-sm text-amber-700 dark:text-amber-200 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800/40 rounded-lg px-3 py-2">
+                                                        Deadline approaching in {Math.max(1, Math.ceil(msDiff / (24 * 60 * 60 * 1000)))} days — apply soon.
+                                                    </div>
+                                                )}
+                                                {isPast && !isApplied && (
+                                                    <div className="text-sm text-red-700 dark:text-red-200 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800/40 rounded-lg px-3 py-2">
+                                                        Deadline has passed.
+                                                    </div>
+                                                )}
+                                                <button
+                                                    onClick={() => handleApply(drive._id)}
+                                                    disabled={disableApply}
+                                                    className="w-full btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    {isApplied ? 'Applied' :
+                                                        isPast ? 'Closed' :
+                                                            drive.status === 'closed' ? 'Closed' :
+                                                                applying === drive._id ? 'Applying...' : 'Apply Now'}
+                                                </button>
+                                            </div>
+                                        );
+                                    })()}
                                 </div>
                             ))}
                         </div>
