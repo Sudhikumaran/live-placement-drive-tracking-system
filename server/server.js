@@ -44,9 +44,14 @@ app.use(helmet());
 
 const corsOptions = {
     origin: process.env.CLIENT_URL?.split(',') || ['http://localhost:5173'],
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 204
 };
 app.use(cors(corsOptions));
+// Ensure preflight (OPTIONS) requests return 204 instead of redirecting
+app.options('*', cors(corsOptions));
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
