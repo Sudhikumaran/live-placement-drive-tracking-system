@@ -100,8 +100,6 @@ app.use('/uploads', express.static('uploads'));
 
 // In production, serve client build statically
 if (process.env.NODE_ENV === 'production') {
-    import path from 'path';
-    import { fileURLToPath } from 'url';
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
     const clientDist = path.join(__dirname, '../client/dist');
