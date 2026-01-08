@@ -56,8 +56,8 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-// Preflight handler for OPTIONS requests
-app.options('*', cors(corsOptions));
+// Preflight handler for OPTIONS requests (use /* to avoid path-to-regexp "*" issue on Vercel)
+app.options('/*', cors(corsOptions));
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
