@@ -40,7 +40,11 @@ app.use((req, res, next) => {
 
 // Security & logging middleware
 app.set('trust proxy', 1);
-app.use(helmet());
+
+// Configure helmet to allow cross-origin requests
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
 
 const corsOptions = {
     origin: process.env.CLIENT_URL?.split(',').map(url => url.trim()) || ['http://localhost:5173'],
@@ -51,6 +55,9 @@ const corsOptions = {
     maxAge: 86400
 };
 app.use(cors(corsOptions));
+
+// Preflight handler for OPTIONS requests
+app.options('*', cors(corsOptions));
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
